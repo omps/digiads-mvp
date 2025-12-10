@@ -1,0 +1,6 @@
+# Alternative format for podman-compose compatibility
+# This is an alias - you can use either docker-compose.yml or this file
+version: '3.8'
+
+include:
+  - docker-compose.yml

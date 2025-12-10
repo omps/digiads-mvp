@@ -1,0 +1,31 @@
+{
+  "name": "notification-service",
+  "version": "1.0.0",
+  "description": "Real-time notification microservice",
+  "main": "notify.server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node notify.server.js",
+    "dev": "nodemon notify.server.js",
+    "swagger": "node ./resources/swagger.config.js"
+  },
+  "dependencies": {
+    "axios": "^0.30.0",
+    "compression": "^1.7.4",
+    "config": "^3.3.6",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "helmet": "^4.4.1",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "socket.io": "^4.0.0",
+    "swagger-ui-express": "^4.1.6",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.35",
+    "nodemon": "^2.0.13",
+    "swagger-autogen": "^2.7.2"
+  }
+}

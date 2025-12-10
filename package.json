@@ -1,0 +1,27 @@
+{
+  "name": "digiads-mvp",
+  "version": "1.0.0",
+  "description": "Social Media Management Platform MVP",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "install-all": "npm install && cd User && npm install && cd ../Publish && npm install && cd ../Feeds && npm install && cd ../Notification && npm install",
+    "start-user": "cd User && npm start",
+    "start-publish": "cd Publish && npm start",
+    "start-feeds": "cd Feeds && npm start",
+    "start-notify": "cd Notification && npm start",
+    "dev-user": "cd User && npm run dev",
+    "dev-publish": "cd Publish && npm run dev",
+    "dev-feeds": "cd Feeds && npm run dev",
+    "dev-notify": "cd Notification && npm run dev",
+    "db-migrate": "cd User && npx sequelize-cli db:migrate"
+  },
+  "keywords": [
+    "social-media",
+    "microservices",
+    "nodejs",
+    "express"
+  ],
+  "author": "DigiAds MVP Team",
+  "license": "MIT"
+}

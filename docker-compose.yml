@@ -1,0 +1,226 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: digiads-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_123
+      MYSQL_DATABASE: socioboard_mvp
+      MYSQL_USER: socioboard_user
+      MYSQL_PASSWORD: socioboard_pass_123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - digiads_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: digiads-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin_pass_123
+      MONGO_INITDB_DATABASE: socioboard_feeds
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./docker/mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+    networks:
+      - digiads_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Redis Cache (Optional but recommended)
+  redis:
+    image: redis:7-alpine
+    container_name: digiads-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - digiads_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # User Service
+  user-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.user
+    container_name: digiads-user-service
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: socioboard_user
+      MYSQL_PASSWORD: socioboard_pass_123
+      MYSQL_DATABASE: socioboard_mvp
+      JWT_SECRET: your_jwt_secret_key_change_in_production
+      JWT_EXPIRY: 7d
+      SERVICE_URL: http://localhost:3000
+      PUBLISH_SERVICE_URL: http://publish-service:3001
+      FEEDS_SERVICE_URL: http://feeds-service:3002
+      NOTIFICATION_SERVICE_URL: http://notification-service:3003
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - digiads_network
+    restart: unless-stopped
+    volumes:
+      - ./User:/app/User
+
+  # Publish Service
+  publish-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.publish
+    container_name: digiads-publish-service
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: socioboard_user
+      MYSQL_PASSWORD: socioboard_pass_123
+      MYSQL_DATABASE: socioboard_mvp
+      SERVICE_URL: http://localhost:3001
+      USER_SERVICE_URL: http://user-service:3000
+      NOTIFICATION_SERVICE_URL: http://notification-service:3003
+    ports:
+      - "3001:3001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - digiads_network
+    restart: unless-stopped
+    volumes:
+      - ./Publish:/app/Publish
+
+  # Feeds Service
+  feeds-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.feeds
+    container_name: digiads-feeds-service
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      MONGO_URI: mongodb://admin:admin_pass_123@mongodb:27017/socioboard_feeds?authSource=admin
+      REDIS_URL: redis://redis:6379
+      SERVICE_URL: http://localhost:3002
+      USER_SERVICE_URL: http://user-service:3000
+    ports:
+      - "3002:3002"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - digiads_network
+    restart: unless-stopped
+    volumes:
+      - ./Feeds:/app/Feeds
+
+  # Notification Service
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.notification
+    container_name: digiads-notification-service
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      MONGO_URI: mongodb://admin:admin_pass_123@mongodb:27017/socioboard_notifications?authSource=admin
+      REDIS_URL: redis://redis:6379
+      SERVICE_URL: http://localhost:3003
+      USER_SERVICE_URL: http://user-service:3000
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+    ports:
+      - "3003:3003"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - digiads_network
+    restart: unless-stopped
+    volumes:
+      - ./Notification:/app/Notification
+
+  # MailHog for Email Testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: digiads-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - digiads_network
+    restart: unless-stopped
+
+  # Adminer for Database Management
+  adminer:
+    image: adminer:latest
+    container_name: digiads-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - digiads_network
+    restart: unless-stopped
+
+  # MongoDB Express for MongoDB Management
+  mongo-express:
+    image: mongo-express:latest
+    container_name: digiads-mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin_pass_123
+      ME_CONFIG_MONGODB_URL: mongodb://admin:admin_pass_123@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin_pass_123
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodb
+    networks:
+      - digiads_network
+    restart: unless-stopped
+
+networks:
+  digiads_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  mongodb_data:
+  redis_data:

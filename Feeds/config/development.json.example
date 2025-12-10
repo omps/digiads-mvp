@@ -1,0 +1,36 @@
+{
+  "port": 3002,
+  "mongodb": {
+    "uri": "mongodb://localhost:27017/socioboard_feeds"
+  },
+  "mysql": {
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "",
+    "database": "socioboard_mvp",
+    "dialect": "mysql"
+  },
+  "jwt": {
+    "secret": "your-secret-key-change-in-production"
+  },
+  "services": {
+    "user": "http://localhost:3000",
+    "publish": "http://localhost:3001",
+    "notification": "http://localhost:3003"
+  },
+  "feedSources": {
+    "pixabay": {
+      "apiKey": "",
+      "baseUrl": "https://pixabay.com/api/"
+    },
+    "unsplash": {
+      "apiKey": "",
+      "baseUrl": "https://api.unsplash.com/"
+    }
+  },
+  "logging": {
+    "level": "info",
+    "file": "./logs/feeds-service.log"
+  }
+}

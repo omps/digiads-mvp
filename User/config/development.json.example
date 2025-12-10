@@ -1,0 +1,39 @@
+{
+  "port": 3000,
+  "mysql": {
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "",
+    "database": "socioboard_mvp",
+    "dialect": "mysql",
+    "logging": false,
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    }
+  },
+  "jwt": {
+    "secret": "your-secret-key-change-in-production",
+    "expiry": "7d",
+    "refreshExpiry": "30d"
+  },
+  "bcrypt": {
+    "saltRounds": 10
+  },
+  "services": {
+    "publish": "http://localhost:3001",
+    "feeds": "http://localhost:3002",
+    "notification": "http://localhost:3003"
+  },
+  "rateLimit": {
+    "windowMs": 900000,
+    "max": 100
+  },
+  "logging": {
+    "level": "info",
+    "file": "./logs/user-service.log"
+  }
+}

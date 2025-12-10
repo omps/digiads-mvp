@@ -1,0 +1,31 @@
+{
+  "port": 3003,
+  "jwt": {
+    "secret": "your-secret-key-change-in-production"
+  },
+  "services": {
+    "user": "http://localhost:3000",
+    "publish": "http://localhost:3001",
+    "feeds": "http://localhost:3002"
+  },
+  "email": {
+    "smtp": {
+      "host": "smtp.gmail.com",
+      "port": 587,
+      "secure": false,
+      "auth": {
+        "user": "",
+        "pass": ""
+      }
+    },
+    "from": "noreply@digiads-mvp.com"
+  },
+  "socketio": {
+    "pingTimeout": 60000,
+    "pingInterval": 25000
+  },
+  "logging": {
+    "level": "info",
+    "file": "./logs/notification-service.log"
+  }
+}

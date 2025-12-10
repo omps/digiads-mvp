@@ -1,0 +1,47 @@
+{
+  "name": "user-service",
+  "version": "1.0.0",
+  "description": "User authentication and management microservice",
+  "main": "user.server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node user.server.js",
+    "dev": "nodemon user.server.js",
+    "swagger": "node ./resources/swagger.config.js",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+  },
+  "dependencies": {
+    "async": "^3.2.0",
+    "axios": ">=0.30.0",
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "config": "^3.3.6",
+    "cookie-parser": "^1.4.5",
+    "cookie-session": "^1.4.0",
+    "csurf": "^1.11.0",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "express-rate-limit": "^5.2.6",
+    "helmet": "^4.4.1",
+    "joi": "^17.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.9.7",
+    "sequelize": "^6.5.1",
+    "socket.io": "^4.0.0",
+    "swagger-ui-express": "^4.1.6",
+    "uuidv1": "^1.6.14",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.35",
+    "jest": "^27.0.6",
+    "nodemon": "^2.0.13",
+    "sequelize-cli": "^6.2.0",
+    "swagger-autogen": "^2.7.2"
+  }
+}
